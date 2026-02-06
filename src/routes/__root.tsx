@@ -3,6 +3,9 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
+import { Toaster } from '@/components/ui/sonner'
+import { ThemeProvider } from '@/lib/theme-provider'
+import Navbar from '@/components/app/navbar'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -17,6 +20,9 @@ export const Route = createRootRoute({
       {
         title: 'TanStack Start Starter',
       },
+      {
+        description: "TanStack Start Starter with Prisma, Better Auth, ShadCN "
+      }
     ],
     links: [
       {
@@ -36,7 +42,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ThemeProvider>
+          <div className='min-h-screen '>
+            <Navbar />
+            {/* <div className='max-w-7xl mx-auto mt-14 p-6 md:p-10'> */}
+            <main className='max-w-7xl mx-auto mt-10 p-6 md:p-10'>
+              {children}
+            </main>
+          </div>
+        </ThemeProvider>
+        <Toaster closeButton position='top-center' />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
