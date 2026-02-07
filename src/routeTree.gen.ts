@@ -10,7 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RedirectedRouteImport } from './routes/redirected'
-import { Route as AuthRouteRouteImport } from './routes/_auth/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GeneralSolutionRouteImport } from './routes/_general/solution'
 import { Route as GeneralPricingRouteImport } from './routes/_general/pricing'
@@ -20,8 +21,6 @@ import { Route as AuthedNotificationsRouteImport } from './routes/_authed/notifi
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedBillingRouteImport } from './routes/_authed/billing'
 import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
-import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
-import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const RedirectedRoute = RedirectedRouteImport.update({
@@ -29,8 +28,13 @@ const RedirectedRoute = RedirectedRouteImport.update({
   path: '/redirected',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRouteRoute = AuthRouteRouteImport.update({
-  id: '/_auth',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedRouteRoute = AuthedRouteRouteImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -59,34 +63,24 @@ const GeneralAboutRoute = GeneralAboutRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedNotificationsRoute = AuthedNotificationsRouteImport.update({
-  id: '/_authed/notifications',
+  id: '/notifications',
   path: '/notifications',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
-  id: '/_authed/dashboard',
+  id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthedBillingRoute = AuthedBillingRouteImport.update({
-  id: '/_authed/billing',
+  id: '/billing',
   path: '/billing',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthedAccountRoute = AuthedAccountRouteImport.update({
-  id: '/_authed/account',
+  id: '/account',
   path: '/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AuthRouteRoute,
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -96,9 +90,8 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/redirected': typeof RedirectedRoute
-  '/login': typeof AuthLoginRoute
-  '/signup': typeof AuthSignupRoute
   '/account': typeof AuthedAccountRoute
   '/billing': typeof AuthedBillingRoute
   '/dashboard': typeof AuthedDashboardRoute
@@ -111,9 +104,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/redirected': typeof RedirectedRoute
-  '/login': typeof AuthLoginRoute
-  '/signup': typeof AuthSignupRoute
   '/account': typeof AuthedAccountRoute
   '/billing': typeof AuthedBillingRoute
   '/dashboard': typeof AuthedDashboardRoute
@@ -127,10 +119,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_auth': typeof AuthRouteRouteWithChildren
+  '/_authed': typeof AuthedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/redirected': typeof RedirectedRoute
-  '/_auth/login': typeof AuthLoginRoute
-  '/_auth/signup': typeof AuthSignupRoute
   '/_authed/account': typeof AuthedAccountRoute
   '/_authed/billing': typeof AuthedBillingRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
@@ -145,9 +136,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/redirected'
-    | '/login'
-    | '/signup'
     | '/account'
     | '/billing'
     | '/dashboard'
@@ -160,9 +150,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/redirected'
-    | '/login'
-    | '/signup'
     | '/account'
     | '/billing'
     | '/dashboard'
@@ -175,10 +164,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/_auth'
+    | '/_authed'
+    | '/auth'
     | '/redirected'
-    | '/_auth/login'
-    | '/_auth/signup'
     | '/_authed/account'
     | '/_authed/billing'
     | '/_authed/dashboard'
@@ -192,12 +180,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   RedirectedRoute: typeof RedirectedRoute
-  AuthedAccountRoute: typeof AuthedAccountRoute
-  AuthedBillingRoute: typeof AuthedBillingRoute
-  AuthedDashboardRoute: typeof AuthedDashboardRoute
-  AuthedNotificationsRoute: typeof AuthedNotificationsRoute
   GeneralAboutRoute: typeof GeneralAboutRoute
   GeneralFeaturesRoute: typeof GeneralFeaturesRoute
   GeneralPricingRoute: typeof GeneralPricingRoute
@@ -214,11 +199,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RedirectedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth': {
-      id: '/_auth'
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed': {
+      id: '/_authed'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthRouteRouteImport
+      preLoaderRoute: typeof AuthedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -261,42 +253,28 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof AuthedNotificationsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthedRouteRoute
     }
     '/_authed/dashboard': {
       id: '/_authed/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthedDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthedRouteRoute
     }
     '/_authed/billing': {
       id: '/_authed/billing'
       path: '/billing'
       fullPath: '/billing'
       preLoaderRoute: typeof AuthedBillingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthedRouteRoute
     }
     '/_authed/account': {
       id: '/_authed/account'
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AuthedAccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth/signup': {
-      id: '/_auth/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/login': {
-      id: '/_auth/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthRouteRoute
+      parentRoute: typeof AuthedRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -308,28 +286,29 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthRouteRouteChildren {
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthSignupRoute: typeof AuthSignupRoute
+interface AuthedRouteRouteChildren {
+  AuthedAccountRoute: typeof AuthedAccountRoute
+  AuthedBillingRoute: typeof AuthedBillingRoute
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedNotificationsRoute: typeof AuthedNotificationsRoute
 }
 
-const AuthRouteRouteChildren: AuthRouteRouteChildren = {
-  AuthLoginRoute: AuthLoginRoute,
-  AuthSignupRoute: AuthSignupRoute,
-}
-
-const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
-  AuthRouteRouteChildren,
-)
-
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AuthRouteRoute: AuthRouteRouteWithChildren,
-  RedirectedRoute: RedirectedRoute,
+const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedAccountRoute: AuthedAccountRoute,
   AuthedBillingRoute: AuthedBillingRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedNotificationsRoute: AuthedNotificationsRoute,
+}
+
+const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
+  AuthedRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AuthedRouteRoute: AuthedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  RedirectedRoute: RedirectedRoute,
   GeneralAboutRoute: GeneralAboutRoute,
   GeneralFeaturesRoute: GeneralFeaturesRoute,
   GeneralPricingRoute: GeneralPricingRoute,

@@ -110,7 +110,7 @@ export function AuthComponent({
                     :
                     // No need to show spinner as dropdown closes on clicking
                     <Link
-                        to="/login"
+                        to="/auth"
                         className={cn(buttonVariants({ variant: 'secondary' }), "h-10")}
                         onClick={() => onClickLink()}>
                         Login

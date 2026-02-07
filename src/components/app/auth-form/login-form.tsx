@@ -17,14 +17,19 @@ import {
 import { Input } from '@/components/ui/input'
 import { loginSchema } from '@/schemas/auth'
 import { useForm } from '@tanstack/react-form'
-import { Link, useNavigate } from '@tanstack/react-router'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
 import { signIn } from '@/lib/auth-client'
-import { PasswordInput } from '../password-input'
+import { PasswordInput } from '../../password-input'
 
-export function LoginForm() {
-    const navigate = useNavigate()
+interface LoginFormProps {
+    redirectTo: string | undefined;
+    flipParentLoginState: (stateParam: boolean) => void;
+}
+
+export function LoginForm({ redirectTo, flipParentLoginState }:
+    LoginFormProps) {
+    const redirectUrl = redirectTo ?? '/'
     const [isPending, startTransition] = useTransition()
     const [isGooglePending, startGoogleTransition] = useTransition()
     const form = useForm({
@@ -40,13 +45,14 @@ export function LoginForm() {
                 await signIn.email({
                     email: value.email,
                     password: value.password,
-                    //callbackURL: '/dashboard',
+                    // callbackURL: '/redirected',
+                    callbackURL: redirectUrl,
                     fetchOptions: {
                         onSuccess: () => {
                             toast.success('Logged in successfully')
-                            navigate({
-                                to: '/dashboard',
-                            })
+                            // navigate({
+                            //     to: pathname,
+                            // })
                         },
                         onError: ({ error }) => {
                             toast.error(error.message)
@@ -75,13 +81,14 @@ export function LoginForm() {
         startGoogleTransition(async () => {
             await signIn.social({
                 provider: "google",
-                //callbackURL: '/dashboard',
+                // callbackURL: '/redirected',
+                callbackURL: redirectUrl,
                 fetchOptions: {
                     onSuccess: () => {
                         toast.success('Logged in with Google successfully')
-                        navigate({
-                            to: '/dashboard',
-                        })
+                        // navigate({
+                        //     to: pathname,
+                        // })
                     },
                     onError: ({ error }) => {
                         toast.error(error.message)
@@ -179,7 +186,8 @@ export function LoginForm() {
                             </Button>
 
                             <FieldDescription className="text-center">
-                                Don&apos;t have an account? <Link to="/signup">Sign up</Link>
+                                {/* Don&apos;t have an account? <Link to="/signup">Sign up</Link> */}
+                                Don&apos;t have an account? <Button variant="link" onClick={() => { flipParentLoginState(false) }}>Sign up</Button>
                             </FieldDescription>
                         </Field>
                     </FieldGroup>

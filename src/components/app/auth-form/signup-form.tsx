@@ -21,12 +21,17 @@ import { useForm } from '@tanstack/react-form'
 import { toast } from 'sonner'
 import { useTransition } from 'react'
 import { signIn, signUp } from '@/lib/auth-client'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { PasswordInput } from '../password-input'
+import { PasswordInput } from '../../password-input'
 import { signupSchema } from '@/schemas/auth'
 
-export function SignupForm() {
-    const navigate = useNavigate()
+interface SignUpFormProps {
+    redirectTo: string | undefined;
+    flipParentLoginState: (stateParam: boolean) => void;
+}
+
+export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps) {
+    // const navigate = useNavigate()
+    const redirectUrl = redirectTo ?? '/'
     const [isPending, startTransition] = useTransition()
     const [isGooglePending, startGoogleTransition] = useTransition()
     const form = useForm({
@@ -45,13 +50,14 @@ export function SignupForm() {
                     name: value.fullName,
                     email: value.email,
                     password: value.password,
-                    //callbackURL: '/dashboard',
+                    // callbackURL: '/redirected',
+                    callbackURL: redirectUrl,
                     fetchOptions: {
                         onSuccess: () => {
                             toast.success('Account creates successfully')
-                            navigate({
-                                to: '/dashboard',
-                            })
+                            // navigate({
+                            //     to: '/dashboard',
+                            // })
                         },
                         onError: ({ error }) => {
                             toast.error(error.message)
@@ -66,7 +72,8 @@ export function SignupForm() {
         startGoogleTransition(async () => {
             await signIn.social({
                 provider: "google",
-                //callbackURL: '/dashboard',
+                // callbackURL: '/redirected',
+                callbackURL: redirectUrl,
                 fetchOptions: {
                     onSuccess: () => {
                         toast.success('Logged in with Google successfully')
@@ -81,6 +88,7 @@ export function SignupForm() {
     }
 
     return (
+
         <Card className="max-w-md w-full">
             <CardHeader>
                 <CardTitle>Create an account</CardTitle>
@@ -236,7 +244,9 @@ export function SignupForm() {
                                     {isGooglePending ? 'Signing up with Google...' : 'Sign up with Google'}
                                 </Button>
                                 <FieldDescription className="px-6 text-center">
-                                    Already have an account? <Link to="/login">Sign in</Link>
+                                    {/* Already have an account? <Link to="/login">Sign in</Link> */}
+                                    Already have an account? <Button variant="link"
+                                        onClick={() => { flipParentLoginState(true) }}>Sign in</Button>
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>
@@ -244,5 +254,6 @@ export function SignupForm() {
                 </form>
             </CardContent>
         </Card>
+
     )
 }
