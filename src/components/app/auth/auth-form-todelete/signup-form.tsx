@@ -1,4 +1,3 @@
-"use client"
 import { Button } from '@/components/ui/button'
 import {
     Card,
@@ -15,43 +14,49 @@ import {
     FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { loginSchema } from '@/schemas/auth'
-import { useForm } from '@tanstack/react-form'
-import { useTransition } from 'react'
-import { toast } from 'sonner'
-import { signIn } from '@/lib/auth-client'
-import { PasswordInput } from '../../password-input'
 
-interface LoginFormProps {
+import { useForm } from '@tanstack/react-form'
+
+
+import { toast } from 'sonner'
+import { useTransition } from 'react'
+import { signIn, signUp } from '@/lib/auth/auth-client'
+import { PasswordInput } from '../../password-input'
+import { signupSchema } from '@/schemas/auth'
+
+interface SignUpFormProps {
     redirectTo: string | undefined;
     flipParentLoginState: (stateParam: boolean) => void;
 }
 
-export function LoginForm({ redirectTo, flipParentLoginState }:
-    LoginFormProps) {
+export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps) {
+    // const navigate = useNavigate()
     const redirectUrl = redirectTo ?? '/'
     const [isPending, startTransition] = useTransition()
     const [isGooglePending, startGoogleTransition] = useTransition()
     const form = useForm({
         defaultValues: {
+            fullName: '',
             email: '',
             password: '',
+            confirmPassword: ''
         },
         validators: {
-            onSubmit: loginSchema,
+            onSubmit: signupSchema,
         },
         onSubmit: ({ value }) => {
             startTransition(async () => {
-                await signIn.email({
+                await signUp.email({
+                    name: value.fullName,
                     email: value.email,
                     password: value.password,
                     // callbackURL: '/redirected',
                     callbackURL: redirectUrl,
                     fetchOptions: {
                         onSuccess: () => {
-                            toast.success('Logged in successfully')
+                            toast.success('Account creates successfully')
                             // navigate({
-                            //     to: pathname,
+                            //     to: '/dashboard',
                             // })
                         },
                         onError: ({ error }) => {
@@ -59,20 +64,6 @@ export function LoginForm({ redirectTo, flipParentLoginState }:
                         },
                     },
                 })
-                // const response = await signIn.email({
-                //     email: value.email,
-                //     password: value.password,
-                // },
-                //     {
-                //         onSuccess: () => {
-                //             toast.success('Logged in successfully')
-                //             router.push('/dashboard')
-                //         },
-                //         onError: ({ error }) => {
-                //             toast.error(error.message)
-                //         }
-                //     })
-                // console.log(response)
             })
         },
     })
@@ -86,24 +77,23 @@ export function LoginForm({ redirectTo, flipParentLoginState }:
                 fetchOptions: {
                     onSuccess: () => {
                         toast.success('Logged in with Google successfully')
-                        // navigate({
-                        //     to: pathname,
-                        // })
                     },
                     onError: ({ error }) => {
                         toast.error(error.message)
                     },
                 },
-            })
+            },
+            )
         })
     }
 
     return (
+
         <Card className="max-w-md w-full">
             <CardHeader>
-                <CardTitle>Login to your account</CardTitle>
+                <CardTitle>Create an account</CardTitle>
                 <CardDescription>
-                    Enter your email below to login to your account
+                    Enter your information below to create your account
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -114,6 +104,32 @@ export function LoginForm({ redirectTo, flipParentLoginState }:
                     }}
                 >
                     <FieldGroup>
+                        <form.Field
+                            name="fullName"
+                            children={(field) => {
+                                const isInvalid =
+                                    field.state.meta.isTouched && !field.state.meta.isValid
+                                return (
+                                    <Field data-invalid={isInvalid}>
+                                        <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
+                                        <Input
+                                            id={field.name}
+                                            name={field.name}
+                                            value={field.state.value}
+                                            onBlur={field.handleBlur}
+                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            aria-invalid={isInvalid}
+                                            placeholder="John Fisher"
+                                            autoComplete="off"
+                                        />
+                                        {isInvalid && (
+                                            <FieldError errors={field.state.meta.errors} />
+                                        )}
+                                    </Field>
+                                )
+                            }}
+                        />
+
                         <form.Field
                             name="email"
                             children={(field) => {
@@ -155,6 +171,7 @@ export function LoginForm({ redirectTo, flipParentLoginState }:
                                             value={field.state.value}
                                             onBlur={field.handleBlur}
                                             onChange={(e) => field.handleChange(e.target.value)}
+
                                             aria-invalid={isInvalid}
                                             placeholder="******"
                                             autoComplete="off"
@@ -177,22 +194,66 @@ export function LoginForm({ redirectTo, flipParentLoginState }:
                                 )
                             }}
                         />
-                        <Field>
-                            <Button disabled={isPending} type="submit">
-                                {isPending ? 'Logging in...' : 'Login'}
-                            </Button>
-                            <Button disabled={isPending} variant="outline" type="button" onClick={handleGoogleSignIn}>
-                                {isGooglePending ? 'Logging in with Google...' : 'Login with Google'}
-                            </Button>
 
-                            <FieldDescription className="text-center">
-                                {/* Don&apos;t have an account? <Link to="/signup">Sign up</Link> */}
-                                Don&apos;t have an account? <Button variant="link" onClick={() => { flipParentLoginState(false) }}>Sign up</Button>
-                            </FieldDescription>
-                        </Field>
+                        <form.Field
+                            name="confirmPassword"
+                            // This is the key part: listen to the password field's changes
+
+                            children={(field) => {
+                                const isInvalid =
+                                    field.state.meta.isTouched && !field.state.meta.isValid
+                                return (
+                                    <Field data-invalid={isInvalid}>
+                                        <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+                                        <PasswordInput
+                                            id={field.name}
+                                            name={field.name}
+                                            value={field.state.value}
+                                            onBlur={field.handleBlur}
+                                            onChange={(e) => field.handleChange(e.target.value)}
+
+                                            aria-invalid={isInvalid}
+                                            placeholder="Repeat Password"
+                                            autoComplete="off"
+                                        />
+                                        {/* <Input
+                                            id={field.name}
+                                            name={field.name}
+                                            value={field.state.value}
+                                            onBlur={field.handleBlur}
+                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            aria-invalid={isInvalid}
+                                            placeholder="******"
+                                            type="password"
+                                            autoComplete="off"
+                                        /> */}
+                                        {isInvalid && (
+                                            <FieldError errors={field.state.meta.errors} />
+                                        )}
+                                    </Field>
+                                )
+                            }}
+                        />
+
+                        <FieldGroup>
+                            <Field>
+                                <Button disabled={isPending} type="submit">
+                                    {isPending ? 'Creating...' : 'Create Account'}
+                                </Button>
+                                <Button disabled={isPending} variant="outline" type="button" onClick={handleGoogleSignIn}>
+                                    {isGooglePending ? 'Signing up with Google...' : 'Sign up with Google'}
+                                </Button>
+                                <FieldDescription className="px-6 text-center">
+                                    {/* Already have an account? <Link to="/login">Sign in</Link> */}
+                                    Already have an account? <Button variant="link"
+                                        onClick={() => { flipParentLoginState(true) }}>Sign in</Button>
+                                </FieldDescription>
+                            </Field>
+                        </FieldGroup>
                     </FieldGroup>
                 </form>
             </CardContent>
         </Card>
+
     )
 }

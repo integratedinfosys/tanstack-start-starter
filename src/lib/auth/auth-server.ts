@@ -12,3 +12,9 @@ export const getSessionFn = createServerFn({ method: "GET" }).handler(
         return session;
     },
 );
+
+export const getUserIdFn = createServerFn({ method: "GET" })
+    .handler(async () => {
+        const session = await getSessionFn()
+        return session?.user.id
+    });

@@ -5,7 +5,7 @@ import React from 'react'
 
 import { buttonVariants } from '../ui/button'
 
-import { AuthComponent } from './auth-component'
+import { AuthedComponent } from './auth/authed-component'
 
 import { ThemeToggle } from './theme-toggle'
 
@@ -126,7 +126,7 @@ export const Navbar = () => {
                             </div> */}
                             <div className="flex items-center gap-3">
                                 <div className='hidden lg:block'><ThemeToggle /></div>
-                                <AuthComponent onClickLink={handleAuthComponentClick} />
+                                <AuthedComponent onClickLink={handleAuthComponentClick} />
                                 {/* <>
                                     {isPending ? null : session ? (
                                         <>

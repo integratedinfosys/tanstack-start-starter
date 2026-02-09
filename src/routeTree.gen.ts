@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RedirectedRouteImport } from './routes/redirected'
-import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthTodeleteRouteImport } from './routes/auth-todelete'
 import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GeneralSolutionRouteImport } from './routes/_general/solution'
@@ -28,9 +28,9 @@ const RedirectedRoute = RedirectedRouteImport.update({
   path: '/redirected',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const AuthTodeleteRoute = AuthTodeleteRouteImport.update({
+  id: '/auth-todelete',
+  path: '/auth-todelete',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedRouteRoute = AuthedRouteRouteImport.update({
@@ -90,7 +90,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth-todelete': typeof AuthTodeleteRoute
   '/redirected': typeof RedirectedRoute
   '/account': typeof AuthedAccountRoute
   '/billing': typeof AuthedBillingRoute
@@ -104,7 +104,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth-todelete': typeof AuthTodeleteRoute
   '/redirected': typeof RedirectedRoute
   '/account': typeof AuthedAccountRoute
   '/billing': typeof AuthedBillingRoute
@@ -120,7 +120,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth-todelete': typeof AuthTodeleteRoute
   '/redirected': typeof RedirectedRoute
   '/_authed/account': typeof AuthedAccountRoute
   '/_authed/billing': typeof AuthedBillingRoute
@@ -136,7 +136,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth'
+    | '/auth-todelete'
     | '/redirected'
     | '/account'
     | '/billing'
@@ -150,7 +150,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
+    | '/auth-todelete'
     | '/redirected'
     | '/account'
     | '/billing'
@@ -165,7 +165,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authed'
-    | '/auth'
+    | '/auth-todelete'
     | '/redirected'
     | '/_authed/account'
     | '/_authed/billing'
@@ -181,7 +181,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthTodeleteRoute: typeof AuthTodeleteRoute
   RedirectedRoute: typeof RedirectedRoute
   GeneralAboutRoute: typeof GeneralAboutRoute
   GeneralFeaturesRoute: typeof GeneralFeaturesRoute
@@ -199,11 +199,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RedirectedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/auth-todelete': {
+      id: '/auth-todelete'
+      path: '/auth-todelete'
+      fullPath: '/auth-todelete'
+      preLoaderRoute: typeof AuthTodeleteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed': {
@@ -307,7 +307,7 @@ const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRouteRoute: AuthedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthTodeleteRoute: AuthTodeleteRoute,
   RedirectedRoute: RedirectedRoute,
   GeneralAboutRoute: GeneralAboutRoute,
   GeneralFeaturesRoute: GeneralFeaturesRoute,

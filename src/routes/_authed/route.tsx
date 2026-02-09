@@ -1,7 +1,7 @@
-import AuthForm from "@/components/app/auth-form";
+import { AuthedOnlyAlert } from "@/components/app/auth/authed-only-alert";
 import { Spinner } from "@/components/ui/spinner";
-import { useSession } from "@/lib/auth-client";
-import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { useSession } from "@/lib/auth/auth-client";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authed")({
     component: RouteComponent,
@@ -9,12 +9,14 @@ export const Route = createFileRoute("/_authed")({
 
 function RouteComponent() {
     const { data: session, isPending } = useSession()
-    const location = useLocation();
-    const pathname = location.pathname;
-    return (<div>{isPending ?
-        <Spinner data-icon="inline-start" />
-        : session ?
-            <Outlet />
-            :
-            <AuthForm redirectTo={pathname} />}</div>)
+    return (<div>
+        {isPending ?
+            <div className='flex items-center justify-center h-screen'>
+                <Spinner className='size-24' />
+            </div>
+            : session ?
+                <Outlet />
+                :
+                <AuthedOnlyAlert />}
+    </div>)
 }

@@ -7,17 +7,18 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { BadgeCheckIcon, BellIcon, ChevronsUpDownIcon, CreditCardIcon, LogOutIcon } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { Button, buttonVariants } from '../ui/button'
-import { signOut, useSession } from '@/lib/auth-client'
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
+import { Button } from '../../ui/button'
+import { signOut, useSession } from '@/lib/auth/auth-client'
 
 import { toast } from 'sonner'
 
-import { Spinner } from '../ui/spinner'
-import { cn } from '@/lib/utils'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Spinner } from '../../ui/spinner'
+import { useNavigate } from '@tanstack/react-router'
+import { useTransition } from 'react'
+import AuthDialog from './auth-dialog'
 
-export function AuthComponent({
+export function AuthedComponent({
     onClickLink
 }: Readonly<{
     onClickLink: () => void
@@ -29,19 +30,23 @@ export function AuthComponent({
     const imageUrl = userImageUrl ? userImageUrl : 'https://github.com/shadcn.png'
 
     const navigate = useNavigate()
-    const handleSignOut = async () => {
-        await signOut({
-            fetchOptions: {
-                onSuccess: () => {
-                    toast.success('Signed out successfully')
-                    navigate({
-                        to: '/',
-                    })
+    const [isTransistion, startTransition] = useTransition()
+    const handleSignOut = () => {
+        startTransition(async () => {
+            await signOut({
+                fetchOptions: {
+                    onSuccess: () => {
+                        toast.success('Signed out successfully')
+                        // navigate({
+                        //     to: '/',
+                        // })
+                    },
+                    onError: ({ error }) => {
+                        toast.error(error.message)
+                    },
                 },
-                onError: ({ error }) => {
-                    toast.error(error.message)
-                },
-            },
+            })
+            onClickLink()
         })
     }
     const menuContent = (
@@ -64,10 +69,10 @@ export function AuthComponent({
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => { onClickLink(); handleSignOut(); }}>
+            <DropdownMenuItem disabled={isTransistion} onClick={() => { handleSignOut(); }}>
                 <LogOutIcon
                 />
-                Sign Out
+                {isTransistion ? 'Signing Out...' : 'Sign Out'}
             </DropdownMenuItem>
         </>
     )
@@ -109,12 +114,13 @@ export function AuthComponent({
                     //  </DropdownMenu> 
                     :
                     // No need to show spinner as dropdown closes on clicking
-                    <Link
-                        to="/auth"
-                        className={cn(buttonVariants({ variant: 'secondary' }), "h-10")}
-                        onClick={() => onClickLink()}>
-                        Login
-                    </Link>
+                    // <Link
+                    //     to="/auth"
+                    //     className={cn(buttonVariants({ variant: 'secondary' }), "h-10")}
+                    //     onClick={() => onClickLink()}>
+                    //     Login
+                    // </Link>
+                    <AuthDialog />
             }
         </div>
     )

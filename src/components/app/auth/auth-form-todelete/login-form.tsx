@@ -1,3 +1,4 @@
+"use client"
 import { Button } from '@/components/ui/button'
 import {
     Card,
@@ -14,49 +15,43 @@ import {
     FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-
+import { loginSchema } from '@/schemas/auth'
 import { useForm } from '@tanstack/react-form'
-
-
-import { toast } from 'sonner'
 import { useTransition } from 'react'
-import { signIn, signUp } from '@/lib/auth-client'
+import { toast } from 'sonner'
+import { signIn } from '@/lib/auth/auth-client'
 import { PasswordInput } from '../../password-input'
-import { signupSchema } from '@/schemas/auth'
 
-interface SignUpFormProps {
+interface LoginFormProps {
     redirectTo: string | undefined;
     flipParentLoginState: (stateParam: boolean) => void;
 }
 
-export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps) {
-    // const navigate = useNavigate()
+export function LoginForm({ redirectTo, flipParentLoginState }:
+    LoginFormProps) {
     const redirectUrl = redirectTo ?? '/'
     const [isPending, startTransition] = useTransition()
     const [isGooglePending, startGoogleTransition] = useTransition()
     const form = useForm({
         defaultValues: {
-            fullName: '',
             email: '',
             password: '',
-            confirmPassword: ''
         },
         validators: {
-            onSubmit: signupSchema,
+            onSubmit: loginSchema,
         },
         onSubmit: ({ value }) => {
             startTransition(async () => {
-                await signUp.email({
-                    name: value.fullName,
+                await signIn.email({
                     email: value.email,
                     password: value.password,
                     // callbackURL: '/redirected',
                     callbackURL: redirectUrl,
                     fetchOptions: {
                         onSuccess: () => {
-                            toast.success('Account creates successfully')
+                            toast.success('Logged in successfully')
                             // navigate({
-                            //     to: '/dashboard',
+                            //     to: pathname,
                             // })
                         },
                         onError: ({ error }) => {
@@ -64,6 +59,20 @@ export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps
                         },
                     },
                 })
+                // const response = await signIn.email({
+                //     email: value.email,
+                //     password: value.password,
+                // },
+                //     {
+                //         onSuccess: () => {
+                //             toast.success('Logged in successfully')
+                //             router.push('/dashboard')
+                //         },
+                //         onError: ({ error }) => {
+                //             toast.error(error.message)
+                //         }
+                //     })
+                // console.log(response)
             })
         },
     })
@@ -77,23 +86,24 @@ export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps
                 fetchOptions: {
                     onSuccess: () => {
                         toast.success('Logged in with Google successfully')
+                        // navigate({
+                        //     to: pathname,
+                        // })
                     },
                     onError: ({ error }) => {
                         toast.error(error.message)
                     },
                 },
-            },
-            )
+            })
         })
     }
 
     return (
-
         <Card className="max-w-md w-full">
             <CardHeader>
-                <CardTitle>Create an account</CardTitle>
+                <CardTitle>Login to your account</CardTitle>
                 <CardDescription>
-                    Enter your information below to create your account
+                    Enter your email below to login to your account
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -104,32 +114,6 @@ export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps
                     }}
                 >
                     <FieldGroup>
-                        <form.Field
-                            name="fullName"
-                            children={(field) => {
-                                const isInvalid =
-                                    field.state.meta.isTouched && !field.state.meta.isValid
-                                return (
-                                    <Field data-invalid={isInvalid}>
-                                        <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
-                                        <Input
-                                            id={field.name}
-                                            name={field.name}
-                                            value={field.state.value}
-                                            onBlur={field.handleBlur}
-                                            onChange={(e) => field.handleChange(e.target.value)}
-                                            aria-invalid={isInvalid}
-                                            placeholder="John Fisher"
-                                            autoComplete="off"
-                                        />
-                                        {isInvalid && (
-                                            <FieldError errors={field.state.meta.errors} />
-                                        )}
-                                    </Field>
-                                )
-                            }}
-                        />
-
                         <form.Field
                             name="email"
                             children={(field) => {
@@ -171,7 +155,6 @@ export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps
                                             value={field.state.value}
                                             onBlur={field.handleBlur}
                                             onChange={(e) => field.handleChange(e.target.value)}
-
                                             aria-invalid={isInvalid}
                                             placeholder="******"
                                             autoComplete="off"
@@ -194,66 +177,22 @@ export function SignupForm({ redirectTo, flipParentLoginState }: SignUpFormProps
                                 )
                             }}
                         />
+                        <Field>
+                            <Button disabled={isPending} type="submit">
+                                {isPending ? 'Logging in...' : 'Login'}
+                            </Button>
+                            <Button disabled={isPending} variant="outline" type="button" onClick={handleGoogleSignIn}>
+                                {isGooglePending ? 'Logging in with Google...' : 'Login with Google'}
+                            </Button>
 
-                        <form.Field
-                            name="confirmPassword"
-                            // This is the key part: listen to the password field's changes
-
-                            children={(field) => {
-                                const isInvalid =
-                                    field.state.meta.isTouched && !field.state.meta.isValid
-                                return (
-                                    <Field data-invalid={isInvalid}>
-                                        <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
-                                        <PasswordInput
-                                            id={field.name}
-                                            name={field.name}
-                                            value={field.state.value}
-                                            onBlur={field.handleBlur}
-                                            onChange={(e) => field.handleChange(e.target.value)}
-
-                                            aria-invalid={isInvalid}
-                                            placeholder="Repeat Password"
-                                            autoComplete="off"
-                                        />
-                                        {/* <Input
-                                            id={field.name}
-                                            name={field.name}
-                                            value={field.state.value}
-                                            onBlur={field.handleBlur}
-                                            onChange={(e) => field.handleChange(e.target.value)}
-                                            aria-invalid={isInvalid}
-                                            placeholder="******"
-                                            type="password"
-                                            autoComplete="off"
-                                        /> */}
-                                        {isInvalid && (
-                                            <FieldError errors={field.state.meta.errors} />
-                                        )}
-                                    </Field>
-                                )
-                            }}
-                        />
-
-                        <FieldGroup>
-                            <Field>
-                                <Button disabled={isPending} type="submit">
-                                    {isPending ? 'Creating...' : 'Create Account'}
-                                </Button>
-                                <Button disabled={isPending} variant="outline" type="button" onClick={handleGoogleSignIn}>
-                                    {isGooglePending ? 'Signing up with Google...' : 'Sign up with Google'}
-                                </Button>
-                                <FieldDescription className="px-6 text-center">
-                                    {/* Already have an account? <Link to="/login">Sign in</Link> */}
-                                    Already have an account? <Button variant="link"
-                                        onClick={() => { flipParentLoginState(true) }}>Sign in</Button>
-                                </FieldDescription>
-                            </Field>
-                        </FieldGroup>
+                            <FieldDescription className="text-center">
+                                {/* Don&apos;t have an account? <Link to="/signup">Sign up</Link> */}
+                                Don&apos;t have an account? <Button variant="link" onClick={() => { flipParentLoginState(false) }}>Sign up</Button>
+                            </FieldDescription>
+                        </Field>
                     </FieldGroup>
                 </form>
             </CardContent>
         </Card>
-
     )
 }
